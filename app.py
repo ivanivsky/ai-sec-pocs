@@ -1,5 +1,5 @@
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from transformers import pipeline
 
 app = FastAPI(title="AI Security PoC - Sentiment Evasion")
@@ -60,3 +60,18 @@ def post_index(text: str = Form(...)):
     page = HTML.replace("{{norm}}", str(NORMALIZE_INPUT)).replace("{{thr}}", str(NEG_THRESHOLD))
     result_block = f"<h3>Decision</h3><pre>{result}</pre>"
     return page.replace("{% if result %}\n  <h3>Decision</h3>\n  <pre>{{ result }}</pre>\n{% endif %}", result_block)
+
+@app.post("/api/classify")
+async def api_classify(text: str = Form(...)):
+    clean = normalize(text)
+    out = clf(clean)[0]
+    label, score = out["label"], float(out["score"])
+    decision = "BLOCKED" if (label == "NEGATIVE" and score >= NEG_THRESHOLD) else "ALLOWED"
+    return JSONResponse({
+        "input": text,
+        "normalized": clean if clean != text else "(unchanged)",
+        "label": label,
+        "score": round(score, 3),
+        "threshold_neg": NEG_THRESHOLD,
+        "decision": decision
+    })
