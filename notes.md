@@ -14,7 +14,7 @@
 - GET / → HTML form (enter a comment, Submit)
 - POST / → classifies form text, renders decision
 - POST /api/classify → body: text (form or JSON) → returns:
-
+```
 {
   "input": "...",
   "normalized": "...",
@@ -23,22 +23,23 @@
   "threshold_neg": 0.60,
   "decision": "BLOCKED|ALLOWED"
 }
-
+```
 # Setup (tested on macOS ARM)
 
 - Python: 3.12 (recommended for transformers + tokenizers)
 - Create venv & install:
-
+```
 python3.12 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip wheel setuptools
 pip install -r requirements.txt
-
+```
 - Run:
-
+```
 python -m uvicorn app:app --reload
 # open http://127.0.0.1:8000/
-
+```
+```
 ## Requirements (pinned in this branch)
 fastapi==0.111.0
 uvicorn[standard]==0.30.1
@@ -48,6 +49,7 @@ transformers==4.40.2
 torch==2.7.1
 numpy>=2,<3
 requests==2.32.3
+```
 
 ## Demo flow (baseline)
 
@@ -70,8 +72,8 @@ requests==2.32.3
 ## Next steps (attack phase)
 
 - Add TextAttack scripts:
--- ta_generate.py → produce perturbed candidates from a seed negative sentence
--- ta_probe.py → POST each candidate to /api/classify and report BYPASS cases
+  - ta_generate.py → produce perturbed candidates from a seed negative sentence
+  - ta_probe.py → POST each candidate to /api/classify and report BYPASS cases
 - Optional: add attacker.py (manual leetspeak/homoglyph/spacing variants) as a fast fallback.
 
 ## Troubleshooting
